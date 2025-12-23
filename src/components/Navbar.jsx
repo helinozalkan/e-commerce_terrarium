@@ -2,21 +2,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext'; 
+import { useFavorites } from '../context/FavoritesContext'; // YENİ: Favori Context import edildi
 
 const Navbar = () => {
   const isLoggedIn = false; 
   const username = "Misafir";
 
-  // Dinamik Sepet Sayısı (ISO 25010: Fonksiyonel Doğruluk)
+  // Dinamik Sepet Sayısı
   const { cartItems } = useCart();
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  // YENİ: Dinamik Favori Sayısı
+  const { favorites } = useFavorites();
+
   return (
-    // Sticky-top ile her an erişilebilirlik (Faz 2: Kullanılabilirlik)
+    // Tasarım ve Stiller Korundu
     <nav className="navbar navbar-expand-lg sticky-top shadow-sm" style={{ backgroundColor: '#ffffff', borderBottom: '2px solid #2d4a27' }}>
       <div className="container py-1">
         
-        {/* LOGO VE MARKA: Terrarium Lab Kimliği */}
+        {/* LOGO VE MARKA */}
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <img src="https://img.pikbest.com/origin/09/22/78/98ApIkbEsTMvz.png!f305cw" alt="Terrarium Lab Logo" width="45" height="45" className="me-2" />
           <div className="d-flex flex-column">
@@ -30,7 +34,7 @@ const Navbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* NAVİGASYON LİNKLERİ: Mantıksal Hiyerarşi */}
+        {/* NAVİGASYON LİNKLERİ */}
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mx-auto mb-2 mb-lg-0 fw-semibold">
             <li className="nav-item px-3">
@@ -47,15 +51,24 @@ const Navbar = () => {
             </li>
           </ul>
 
-          {/* SAĞ İKONLAR: İşlem Akışı (3 Adım Kuralı) */}
+         
           <div className="d-flex align-items-center gap-3">
             
-            {/* Favoriler */}
+
             <Link to="/favoriler" className="text-dark position-relative">
               <i className="bi bi-heart fs-5"></i>
+            
+              {favorites.length > 0 && (
+                <span 
+                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style={{ fontSize: '0.65rem' }}
+                >
+                  {favorites.length}
+                </span>
+              )}
             </Link>
 
-            {/* Sepet: Dinamik Rozet (Faz 2: Güvenilirlik & Görsel Geri Bildirim) */}
+            {/* SEPET */}
             <Link to="/sepetim" className="position-relative text-decoration-none text-dark">
               <i className="bi bi-bag-check fs-4 text-success"></i>
               {totalItems > 0 && (
@@ -68,8 +81,8 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* Kullanıcı Girişi (ISO 25010: Öğrenilebilirlik) */}
-            <div className="vr mx-2 d-none d-lg-block"></div> {/* Dikey ayırıcı çizgi */}
+            {/* KULLANICI GİRİŞİ */}
+            <div className="vr mx-2 d-none d-lg-block"></div>
             
             <div className="d-flex align-items-center">
               {isLoggedIn ? (

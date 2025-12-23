@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoritesContext'; // YENİ: Context importu
 
 // TERARYUM ÜRÜN VERİLERİ
 const allProducts = [
@@ -12,7 +13,7 @@ const allProducts = [
   { id: 4, name: "Silindir Vazo (Büyük)", category: "Fanuslar", rating: 3.9, description: "Minimalist tasarımlar için yüksek silindir cam.", price: 300, image: "fanus_silindir.jpg" },
   { id: 5, name: "Asılabilir Top Fanus", category: "Fanuslar", rating: 4.1, description: "Makrome iplerle asmaya uygun, düz tabanlı.", price: 180, image: "fanus_top.jpg" },
   { id: 6, name: "Yumurta Cam Teraryum", category: "Fanuslar", rating: 4.6, description: "Oval hatlarıyla bitkiler için geniş alan sağlar.", price: 220, image: "fanus_yumurta.jpg" },
-  { id: 7, name: "Üçgen Kapaklı Kutu", category: "Fanuslar", rating: 5.0, description: "Geometrik cam kapaklı saklama ve sergileme kutusu.", price: 650, image: "fanus_ucgen.jpg" },
+  { id: 7, name: "Altıgen Kapaklı Kutu", category: "Fanuslar", rating: 5.0, description: "Geometrik cam kapaklı saklama ve sergileme kutusu.", price: 650, image: "fanus_ucgen.jpg" },
   { id: 8, name: "Mantar Kapaklı Şişe", category: "Fanuslar", rating: 4.3, description: "Nemli ekosistemler (Mossarium) için ideal.", price: 350, image: "fanus_sise.jpg" },
   { id: 9, name: "Diyagonal Ağızlı Kase", category: "Fanuslar", rating: 4.0, description: "Kolay müdahale edilebilir, eğik ağızlı cam.", price: 190, image: "fanus_diyagonal.jpg" },
   { id: 10, name: "Kadeh Ayaklı Fanus", category: "Fanuslar", rating: 4.7, description: "Yüksek ayaklı, sunum için gösterişli fanus.", price: 400, image: "fanus_kadeh.jpg" },
@@ -70,6 +71,8 @@ const categories = ["Tümü", "Fanuslar", "Bitkiler", "Malzemeler", "Dekor", "Ba
 
 const Products = () => {
   const { addToCart } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites(); // YENİ: Favori fonksiyonlarını çektik
+
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [sortOption, setSortOption] = useState("varsayilan");
   const [filteredProducts, setFilteredProducts] = useState(allProducts);
@@ -101,13 +104,15 @@ const Products = () => {
     setFilteredProducts(tempProducts);
   }, [selectedCategory, sortOption]);
 
+  const themeColor = '#198754'; 
+
   return (
     <div className="container-fluid bg-light" style={{ minHeight: '100vh', paddingBottom: '50px' }}>
       
       {/* Sayfa Başlığı */}
       <div className="container-fluid px-lg-5 pt-5 pb-4">
         <div className="text-center mb-4 border-bottom pb-4">
-          <div style={{ color: 'rgb(91, 140, 213)', fontSize: '1.2rem' }}>Hayalinizdeki Dünyayı Kurun</div>
+          <div style={{ color: themeColor, fontSize: '1.2rem' }}>Hayalinizdeki Dünyayı Kurun</div>
           <div className="baslik3" style={{ fontSize: '50px' }}>Butik Teraryum Malzemeleri</div>
           <p className="text-muted mt-2">Fanuslardan canlı bitkilere, topraktan minyatür figürlere kadar her şey.</p>
         </div>
@@ -126,7 +131,7 @@ const Products = () => {
                     key={index} 
                     className="btn text-start d-flex justify-content-between align-items-center py-2 px-3 rounded-3 transition-all"
                     style={{ 
-                      backgroundColor: selectedCategory === cat ? 'rgb(91, 140, 213)' : 'transparent',
+                      backgroundColor: selectedCategory === cat ? themeColor : 'transparent',
                       color: selectedCategory === cat ? '#fff' : '#555',
                       border: selectedCategory === cat ? 'none' : '1px solid transparent'
                     }}
@@ -161,14 +166,14 @@ const Products = () => {
               </div>
             </div>
 
-            {/* ÜRÜN KARTLARI - GÜNCELLENMİŞ GÖRSEL AYARLARI */}
+            {/* ÜRÜN KARTLARI */}
             <div className="row g-4">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((urun) => (
                   <div key={urun.id} className="col-md-6 col-lg-4 col-xl-3">
                     <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s' }}>
                       
-                      {/* GÜNCELLENDİ: Padding yok, object-fit: cover, tam genişlik */}
+                      {/* Resim Alanı ve FAVORİ BUTONU */}
                       <div className="position-relative bg-white text-center">
                         <Link to={`/product/${urun.id}`}>
                           <img 
@@ -176,14 +181,29 @@ const Products = () => {
                             onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x300?text=Urun+Resmi"; }}
                             className="card-img-top" 
                             style={{ 
-                              height: '350px', // Yüksekliği biraz artırdık
-                              objectFit: 'cover', // Resmi alana tamamen yay (kırpılabilir ama boşluk kalmaz)
+                              height: '250px', 
+                              objectFit: 'cover', 
                               width: '100%', 
-                              display: 'block' // Alt boşlukları önlemek için
+                              display: 'block' 
                             }} 
                             alt={urun.name} 
                           />
                         </Link>
+                        
+                        {/* YENİ EKLENEN KALP BUTONU */}
+                        <button 
+                          className="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2 p-2 d-flex align-items-center justify-content-center"
+                          style={{ width: '35px', height: '35px', zIndex: 10 }}
+                          onClick={(e) => {
+                            e.preventDefault(); // Link'e gitmeyi engelle
+                            toggleFavorite(urun);
+                          }}
+                        >
+                          <i 
+                            className={`bi ${isFavorite(urun.id) ? 'bi-heart-fill text-danger' : 'bi-heart'}`} 
+                            style={{ fontSize: '1.1rem' }}
+                          ></i>
+                        </button>
                       </div>
                       
                       {/* Kart Gövdesi */}
@@ -210,7 +230,7 @@ const Products = () => {
 
                         <button 
                           className="btn text-white w-100 py-2 btn-sm" 
-                          style={{ backgroundColor: 'rgb(91, 140, 213)', borderRadius: '15px', fontWeight: '600' }}
+                          style={{ backgroundColor: themeColor, borderRadius: '15px', fontWeight: '600' }}
                           onClick={() => addToCart(urun)}
                         >
                           Sepete Ekle
