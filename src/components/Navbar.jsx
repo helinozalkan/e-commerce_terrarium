@@ -35,6 +35,9 @@ const Navbar = () => {
               <Link className="nav-link" to="/siparisler">Sipariş İşlemleri</Link>
             </li>
             <li className="nav-item ps-3">
+              <Link className="nav-link" to="/urunler">Ürünlerimiz</Link>
+            </li>
+            <li className="nav-item ps-3">
               <Link className="nav-link" to="/satici-ol">Satıcı Ol</Link>
             </li>
             <li className="nav-item ps-3">

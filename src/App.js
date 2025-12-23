@@ -8,16 +8,18 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
-import { CartProvider } from './context/CartContext'; // YENİ EKLENDİ
+import Products from './pages/Products'; 
+import { CartProvider } from './context/CartContext';
 
 function App() {
   return (
-    <CartProvider> {/* Provider En Dışa Eklendi */}
+    <CartProvider>
       <Router>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sepetim" element={<Cart />} />
+          <Route path="/urunler" element={<Products />} />
         </Routes>
       </Router>
     </CartProvider>
