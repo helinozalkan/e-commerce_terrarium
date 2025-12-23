@@ -1,0 +1,139 @@
+/* src/App.css */
+html, body {
+    overflow-x: hidden;
+}
+.slideshow {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.slide-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    animation: slide 10s infinite;
+}
+
+.slide-img:nth-child(1) { animation-delay: 0s; }
+.slide-img:nth-child(2) { animation-delay: 5s; }
+
+@keyframes slide {
+    0% { opacity: 0; }
+    25% { opacity: 1; }
+    50% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.baslik2 {
+    font-family: "Edu AU VIC WA NT Hand", cursive;
+    font-weight: bold;
+    line-height: 50px;
+}
+.baslik {
+    font-family: "Courgette", cursive;
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+}
+.baslik3 {
+    font-family: "Edu AU VIC WA NT Hand", cursive;
+}
+
+span.num {
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    font-size: 4em;
+    font-family: "Edu AU VIC WA NT Hand", cursive;
+}
+span.text {
+    font-size: 20px;
+    text-align: center;
+    line-height: 0;
+    font-family: "Edu AU VIC WA NT Hand", cursive;
+    margin-top: 10px;
+}
+.wrapper {
+    display: flex;
+    margin-top: -450px;
+    margin-bottom: 80px;
+    flex-wrap: wrap;
+}
+.wrapper .container {
+    box-sizing: border-box;
+    background-color: white;
+}
+@media (max-width: 768px) {
+    .wrapper { flex-direction: column; }
+    .wrapper .container { margin-bottom: 10px; }
+}
+
+/* Swiper ve Slider Ayarları */
+#tranding { margin-top: -250px; }
+.tranding-slider { height: 52rem; position: relative; }
+@media (max-width: 500px) { .tranding-slider { height: 45rem; } }
+
+.tranding-slide { width: 30rem; height: 42rem; position: relative; }
+.tranding-slide .tranding-slide-img img {
+    width: 200px; height: 200px; border-radius: 50%; object-fit: cover;
+}
+
+/* İlk Slider (Kategoriler) */
+.ilk { width: 100%; }
+.iki {
+    text-align: center; font-size: 18px; background: #fff;
+    display: flex; justify-content: center; align-items: center; border-radius: 10%;
+}
+.img { border-radius: 10%; height: 300px; margin-top: 5px; margin-left: 6px; }
+.swiper-slide { position: relative; }
+.swiper-slide:hover .k { box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.5); }
+
+.text-overlay {
+    position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+    color: white; font-size: 24px; background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px; border-radius: 20px; opacity: 0; transition: all 0.4s ease;
+    width: max-content;
+}
+.swiper-slide:hover .text-overlay { opacity: 1; bottom: 20px; }
+
+/* Countdown */
+.countdown { display: flex; gap: 5px; margin-left: -20px; }
+.countdown div { font-size: 33px; }
+.fixed-size {
+    width: 80px; height: 80px; border-radius: 50%; padding: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: white;
+}
+
+/* Kart Efektleri */
+.a:hover .img-grow { transform: scale(1.1); transition: transform 0.3s ease; }
+.a { overflow: hidden; }
+
+/* Ekip Kartları */
+.b { position: relative; overflow: hidden; }
+.b:hover .img-b { animation: move 0.6s ease-in-out infinite; }
+@keyframes move {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
+}
+
+/* Yorumlar Swiper */
+.my { width: 840px; height: 350px; overflow: hidden; }
+.z {
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    border-radius: 18px; font-size: 22px; font-weight: bold; color: #fff;
+    background-color: rgb(249, 244, 244);
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Montserrat', sans-serif;
+}
