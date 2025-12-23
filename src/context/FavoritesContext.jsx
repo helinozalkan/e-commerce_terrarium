@@ -1,10 +1,21 @@
 // src/context/FavoritesContext.jsx
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
-  const [favorites, setFavorites] = useState([]);
+  // 1. ADIM: Başlangıçta localStorage'ı kontrol et
+  const [favorites, setFavorites] = useState(() => {
+    // Tarayıcıda kayıtlı favoriler var mı?
+    const savedFavorites = localStorage.getItem('favorites');
+    // Varsa JSON'dan çevirip kullan, yoksa boş dizi başlat
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  });
+
+  // 2. ADIM: Favoriler her değiştiğinde localStorage'a kaydet
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
   // Favoriye Ekle / Çıkar (Toggle) Mantığı
   const toggleFavorite = (product) => {
