@@ -2,80 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useFavorites } from '../context/FavoritesContext'; // Favori Context'i
+import { useFavorites } from '../context/FavoritesContext';
 
-
-const allProducts = [
-  // 1. KATEGORİ: FANUSLAR
-  { id: 1,  name: "Geometrik Prizma Fanus", category: "Fanuslar", rating: 4.8, description: "El yapımı bakır çıtalı modern teraryum fanusu.", price: 1250, image: "fanus_geometrik.jpg", stock: 3 },
-  { id: 2,  name: "Elma Cam Fanus (Orta)", category: "Fanuslar", rating: 4.2, description: "Klasik elma formunda üfleme cam fanus.", price: 450,  image: "fanus_elma.jpg",      stock: 8 },
-  { id: 3,  name: "Armut Cam Fanus", category: "Fanuslar", rating: 4.5, description: "Zarif armut tasarımıyla şık bir görünüm.", price: 485, image: "fanus_armut.jpg",     stock: 7 },
-  { id: 4,  name: "Silindir Vazo (Büyük)", category: "Fanuslar", rating: 3.9, description: "Minimalist tasarımlar için yüksek silindir cam.", price: 550, image: "fanus_silindir.jpg", stock: 6 },
-  { id: 5,  name: "Asılabilir Top Fanus", category: "Fanuslar", rating: 4.1, description: "Makrome iplerle asmaya uygun, düz tabanlı.", price: 320, image: "fanus_top.jpg", stock: 10 },
-  { id: 6,  name: "Yumurta Cam Teraryum", category: "Fanuslar", rating: 4.6, description: "Oval hatlarıyla bitkiler için geniş alan sağlar.", price: 390, image: "fanus_yumurta.jpg", stock: 9 },
-  { id: 7,  name: "Altıgen Kapaklı Kutu", category: "Fanuslar", rating: 5.0, description: "Geometrik cam kapaklı saklama ve sergileme kutusu.", price: 950, image: "fanus_ucgen.jpg", stock: 4 },
-  { id: 8,  name: "Mantar Kapaklı Şişe", category: "Fanuslar", rating: 4.3, description: "Nemli ekosistemler (Mossarium) için ideal.", price: 620, image: "fanus_sise.jpg", stock: 5 },
-  { id: 9,  name: "Diyagonal Ağızlı Kase", category: "Fanuslar", rating: 4.0, description: "Kolay müdahale edilebilir, eğik ağızlı cam.", price: 290, image: "fanus_diyagonal.jpg", stock: 12 },
-  { id: 10, name: "Kadeh Ayaklı Fanus", category: "Fanuslar", rating: 4.7, description: "Yüksek ayaklı, sunum için gösterişli fanus.", price: 750, image: "fanus_kadeh.jpg", stock: 4 },
-
-  // 2. KATEGORİ: BİTKİLER
-  { id: 11, name: "Sukulent Mix (3'lü)", category: "Bitkiler", rating: 4.9, description: "Teraryum uyumlu 3 farklı mini sukulent.", price: 225, image: "bitki_sukulent.jpg", stock: 18 },
-  { id: 12, name: "Fittonia (Kırmızı)", category: "Bitkiler", rating: 4.4, description: "Nemli ortamları seven kırmızı damarlı yapraklar.", price: 145, image: "bitki_fittonia.jpg", stock: 14 },
-  { id: 13, name: "Canlı Yosun (Moss)", category: "Bitkiler", rating: 4.1, description: "Teraryum zeminini kaplamak için canlı plaka yosun.", price: 180, image: "bitki_moss.jpg", stock: 22 },
-  { id: 14, name: "Tillandsia (Hava Bitkisi)", category: "Bitkiler", rating: 4.8, description: "Toprağa ihtiyaç duymayan özel hava bitkisi.", price: 310, image: "bitki_tillandsia.jpg", stock: 10 },
-  { id: 15, name: "Minyatür Kaktüs Seti", category: "Bitkiler", rating: 4.5, description: "Dikenli ve dayanıklı 5'li mini kaktüs paketi.", price: 290, image: "bitki_kaktus.jpg", stock: 12 },
-  { id: 16, name: "Pilea (Çin Parası)", category: "Bitkiler", rating: 4.2, description: "Yuvarlak yapraklı, şans getirdiğine inanılan bitki.", price: 165, image: "bitki_pilea.jpg", stock: 9 },
-  { id: 17, name: "Echeveria Rozet", category: "Bitkiler", rating: 4.6, description: "Gül formunda, etli yapraklı popüler sukulent.", price: 110, image: "bitki_echeveria.jpg", stock: 20 },
-  { id: 18, name: "Teraryum Sarmaşığı", category: "Bitkiler", rating: 3.8, description: "Ficus Pumila, hızlı yayılan minik yapraklı sarmaşık.", price: 155, image: "bitki_sarmasik.jpg", stock: 8 },
-  { id: 19, name: "Tavşan Kulağı Kaktüs", category: "Bitkiler", rating: 4.7, description: "Opuntia microdasys, sevimli görünümüyle popüler.", price: 135, image: "bitki_tavsan.jpg", stock: 11 },
-  { id: 20, name: "Haworthia Zebra", category: "Bitkiler", rating: 4.3, description: "Çizgili desenleriyle dikkat çeken dayanıklı tür.", price: 150, image: "bitki_zebra.jpg", stock: 16 },
-
-  // 3. KATEGORİ: MALZEMELER
-  { id: 21, name: "Teraryum Toprağı (2L)", category: "Malzemeler", rating: 4.8, description: "Sukulent ve kaktüsler için özel geçirgen karışım.", price: 120, image: "malz_toprak.jpg", stock: 35 },
-  { id: 22, name: "Aktif Karbon", category: "Malzemeler", rating: 4.5, description: "Bakteri ve koku oluşumunu engelleyen filtrasyon.", price: 95, image: "malz_karbon.jpg", stock: 40 },
-  { id: 23, name: "Lav Kırığı (Drenaj)", category: "Malzemeler", rating: 4.6, description: "Taban drenajı için volkanik kırmızı taş.", price: 85, image: "malz_lav.jpg", stock: 28 },
-  { id: 24, name: "Beyaz Dekor Kumu", category: "Malzemeler", rating: 4.2, description: "İnce taneli, parlak beyaz silis kumu.", price: 75, image: "malz_kum_beyaz.jpg", stock: 50 },
-  { id: 25, name: "Sphagnum Yosunu", category: "Malzemeler", rating: 4.7, description: "Su tutma kapasitesi yüksek kuru yosun lifleri.", price: 190, image: "malz_sphagnum.jpg", stock: 18 },
-  { id: 26, name: "Doğal Dere Çakılı", category: "Malzemeler", rating: 4.1, description: "Nehir yatağından toplanmış yuvarlak hatlı taşlar.", price: 65, image: "malz_cakil.jpg", stock: 60 },
-  { id: 27, name: "Mavi Kristal Kum", category: "Malzemeler", rating: 4.0, description: "Su efekti vermek için cam kırığı görünümlü kum.", price: 90, image: "malz_kum_mavi.jpg", stock: 25 },
-  { id: 28, name: "Vermikülit", category: "Malzemeler", rating: 4.4, description: "Toprağı havalandıran ve nem dengesini sağlayan mineral.", price: 60, image: "malz_vermikulit.jpg", stock: 45 },
-  { id: 29, name: "Ağaç Kabuğu (Bark)", category: "Malzemeler", rating: 4.3, description: "Zemin örtücü doğal çam kabukları.", price: 85, image: "malz_kabuk.jpg", stock: 30 },
-  { id: 30, name: "Kuru Yosun (Dekor)", category: "Malzemeler", rating: 4.6, description: "Bakım gerektirmeyen şoklanmış yeşil yosun.", price: 145, image: "malz_kuru_yosun.jpg", stock: 22 },
-
-  // 4. KATEGORİ: DEKOR
-  { id: 31, name: "Minyatür Ahşap Ev", category: "Dekor", rating: 4.9, description: "El boyaması sevimli minyatür dağ evi.", price: 95, image: "dekor_ev.jpg", stock: 40 },
-  { id: 32, name: "Yapay Göl Jeli", category: "Dekor", rating: 4.1, description: "Isıtılarak sıvılaşan, donunca su görünümü veren jel.", price: 210, image: "dekor_jel.jpg", stock: 16 },
-  { id: 33, name: "Mantar Seti (3'lü)", category: "Dekor", rating: 4.8, description: "Kırmızı benekli minik mantar figürleri.", price: 65, image: "dekor_mantar.jpg", stock: 55 },
-  { id: 34, name: "Oturan Çift Figürü", category: "Dekor", rating: 4.5, description: "Romantik teraryumlar için bankta oturan çift.", price: 110, image: "dekor_cift.jpg", stock: 25 },
-  { id: 35, name: "Sokak Lambası", category: "Dekor", rating: 4.2, description: "Vintage görünümlü minyatür sokak aydınlatması.", price: 85, image: "dekor_lamba.jpg", stock: 30 },
-  { id: 36, name: "Driftwood (Yalı Dalı)", category: "Dekor", rating: 4.7, description: "Doğal formlu, sterilize edilmiş dekoratif dal.", price: 145, image: "dekor_dal.jpg", stock: 18 },
-  { id: 37, name: "Yapay Çim Parçası", category: "Dekor", rating: 3.9, description: "Bahçe görünümü için kesilebilir çim halı.", price: 55, image: "dekor_cim.jpg", stock: 70 },
-  { id: 38, name: "Taş Köprü", category: "Dekor", rating: 4.6, description: "Reçineden yapılmış eski taş köprü modeli.", price: 95, image: "dekor_kopru.jpg", stock: 32 },
-  { id: 39, name: "Beyaz Çit", category: "Dekor", rating: 4.3, description: "Esnek yapılı, şekil verilebilir minyatür çit.", price: 65, image: "dekor_cit.jpg", stock: 50 },
-  { id: 40, name: "Tavşan Figürü", category: "Dekor", rating: 4.8, description: "Beyaz sevimli minyatür tavşan biblosu.", price: 60, image: "dekor_tavsan.jpg", stock: 44 },
-
-  // 5. KATEGORİ: BAKIM
-  { id: 41, name: "Teraryum Cımbızı (30cm)", category: "Bakım", rating: 4.9, description: "Dar ağızlı fanuslar için uzun, eğri uçlu cımbız.", price: 185, image: "bakim_cimbiz.jpg", stock: 14 },
-  { id: 42, name: "Su Spreyi (Cam)", category: "Bakım", rating: 4.7, description: "Bitkileri nemlendirmek için şık cam sprey şişesi.", price: 245, image: "bakim_sprey.jpg", stock: 12 },
-  { id: 43, name: "Mini Tırmık & Kürek", category: "Bakım", rating: 4.4, description: "3 parçalı ahşap saplı mini bahçıvan seti.", price: 160, image: "bakim_set.jpg", stock: 20 },
-  { id: 44, name: "Budama Makası", category: "Bakım", rating: 4.6, description: "İnce dallar ve yapraklar için hassas makas.", price: 215, image: "bakim_makas.jpg", stock: 9 },
-  { id: 45, name: "Temizleme Fırçası", category: "Bakım", rating: 4.1, description: "Yaprak üzerindeki tozları ve toprağı temizlemek için.", price: 75, image: "bakim_firca.jpg", stock: 26 },
-  { id: 46, name: "Sıvı Gübre", category: "Bakım", rating: 4.3, description: "Yeşil yapraklı bitkiler için besin takviyesi.", price: 125, image: "bakim_gubre.jpeg", stock: 18 },
-  { id: 47, name: "Kurulum Eldiveni", category: "Bakım", rating: 4.0, description: "Kaktüs dikimi için koruyucu nitril eldiven.", price: 45, image: "bakim_eldiven.jpg", stock: 40 },
-  { id: 48, name: "Sulama Damlalığı", category: "Bakım", rating: 4.5, description: "Kök dibine hassas su vermek için uzun uçlu şişe.", price: 95, image: "bakim_damlalik.jpg", stock: 22 },
-  { id: 49, name: "Bitki Yapıştırıcısı", category: "Bakım", rating: 4.2, description: "Hava bitkilerini sabitlemek için bitki dostu jel.", price: 165, image: "bakim_yapistirici.jpg", stock: 15 },
-  { id: 50, name: "Kurulum Rehberi", category: "Bakım", rating: 4.8, description: "Adım adım teraryum yapımını anlatan kitapçık.", price: 85, image: "bakim_kitap.jpeg", stock: 30 },
-];
-const categories = ["Tümü", "Fanuslar", "Bitkiler", "Malzemeler", "Dekor", "Bakım"];
+// MERKEZİ VERİ DOSYASINDAN IMPORT EDİYORUZ
+import { allProducts, categories } from '../data/products';
 
 const Products = () => {
   const { addToCart } = useCart();
-  const { toggleFavorite, isFavorite } = useFavorites(); // Favori fonksiyonları
+  const { toggleFavorite, isFavorite } = useFavorites(); 
 
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [sortOption, setSortOption] = useState("varsayilan");
   const [filteredProducts, setFilteredProducts] = useState(allProducts);
 
+  // Yıldız Puanlama Görseli
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -90,15 +30,25 @@ const Products = () => {
     return stars;
   };
 
+  // Filtreleme ve Sıralama Mantığı
   useEffect(() => {
     let tempProducts = [...allProducts];
+
+    // 1. Kategori Filtreleme
     if (selectedCategory !== "Tümü") {
       tempProducts = tempProducts.filter(product => product.category === selectedCategory);
     }
-    if (sortOption === "artan-fiyat") tempProducts.sort((a, b) => a.price - b.price);
-    else if (sortOption === "azalan-fiyat") tempProducts.sort((a, b) => b.price - a.price);
-    else if (sortOption === "isim-az") tempProducts.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sortOption === "isim-za") tempProducts.sort((a, b) => b.name.localeCompare(a.name));
+
+    // 2. Sıralama
+    if (sortOption === "artan-fiyat") {
+      tempProducts.sort((a, b) => a.price - b.price);
+    } else if (sortOption === "azalan-fiyat") {
+      tempProducts.sort((a, b) => b.price - a.price);
+    } else if (sortOption === "isim-az") {
+      tempProducts.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortOption === "isim-za") {
+      tempProducts.sort((a, b) => b.name.localeCompare(a.name));
+    }
 
     setFilteredProducts(tempProducts);
   }, [selectedCategory, sortOption]);
@@ -120,7 +70,7 @@ const Products = () => {
       <div className="container-fluid px-lg-5">
         <div className="row">
           
-          {/* Sidebar */}
+          {/* SOL TARA: YAPIŞKAN (STICKY) SIDEBAR */}
           <div className="col-lg-3 col-xl-2 mb-4">
             <div className="bg-white p-4 shadow-sm rounded-4" style={{ position: 'sticky', top: '20px', border: '1px solid #eee' }}>
               <h5 className="fw-bold mb-4" style={{ color: '#333' }}><i className="bi bi-tree me-2"></i>Kategoriler</h5>
@@ -148,8 +98,9 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Ürün Listesi */}
+          {/* SAĞ TARA: ÜRÜN LİSTESİ */}
           <div className="col-lg-9 col-xl-10">
+            
             {/* Üst Bar */}
             <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 bg-white p-3 rounded-4 shadow-sm mx-1">
               <span className="text-muted ms-2"><strong>{filteredProducts.length}</strong> ürün bulundu</span>
@@ -172,9 +123,10 @@ const Products = () => {
                   <div key={urun.id} className="col-md-6 col-lg-4 col-xl-3">
                     <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '20px', overflow: 'hidden', transition: 'transform 0.2s' }}>
                       
-                      {/* Resim Alanı ve FAVORİ BUTONU */}
+                      {/* --- GÖRSEL ALANI VE UYARILAR --- */}
                       <div className="position-relative bg-white text-center">
-                        <Link to={`/product/${urun.id}`}>
+                        {/* Ürün Tükendiyse Linke Tıklanmasın (Opsiyonel, tıklanabilir de yapılabilir) */}
+                        <Link to={`/product/${urun.id}`} style={{ pointerEvents: urun.stock === 0 ? 'none' : 'auto' }}>
                           <img 
                             src={`/images/${urun.image}`} 
                             onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/300x300?text=Urun+Resmi"; }}
@@ -183,18 +135,41 @@ const Products = () => {
                               height: '250px', 
                               objectFit: 'cover', 
                               width: '100%', 
-                              display: 'block' 
+                              display: 'block',
+                              // Stok 0 ise Siyah-Beyaz yap ve soluklaştır
+                              filter: urun.stock === 0 ? 'grayscale(100%)' : 'none', 
+                              opacity: urun.stock === 0 ? 0.6 : 1
                             }} 
                             alt={urun.name} 
                           />
                         </Link>
+
+                        {/* STOK UYARISI: KRİTİK STOK (0 ile 5 arası) -> Sol Üst Köşe */}
+                        {urun.stock > 0 && urun.stock < 5 && (
+                          <span 
+                            className="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm"
+                            style={{ zIndex: 5, fontSize: '0.75rem' }}
+                          >
+                            Son {urun.stock} ürün!
+                          </span>
+                        )}
+
+                        {/* STOK UYARISI: TÜKENDİ (Stok 0 ise) -> Ortada Büyük Yazı */}
+                        {urun.stock === 0 && (
+                          <div 
+                            className="position-absolute top-50 start-50 translate-middle bg-dark text-white px-4 py-2 rounded fw-bold shadow"
+                            style={{ zIndex: 5, fontSize: '1.2rem', opacity: 0.9 }}
+                          >
+                            TÜKENDİ
+                          </div>
+                        )}
                         
                         {/* KALP BUTONU */}
                         <button 
                           className="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2 p-2 d-flex align-items-center justify-content-center"
                           style={{ width: '35px', height: '35px', zIndex: 10 }}
                           onClick={(e) => {
-                            e.preventDefault(); // Link'e gitmeyi engelle
+                            e.preventDefault(); 
                             toggleFavorite(urun);
                           }}
                         >
@@ -227,13 +202,26 @@ const Products = () => {
                         
                         <div className="fs-5 fw-bold text-dark mb-2">{urun.price} TL</div>
 
-                        <button 
-                          className="btn text-white w-100 py-2 btn-sm" 
-                          style={{ backgroundColor: themeColor, borderRadius: '15px', fontWeight: '600' }}
-                          onClick={() => addToCart(urun)}
-                        >
-                          Sepete Ekle
-                        </button>
+                        {/* BUTON MANTIĞI: STOK KONTROLÜ */}
+                        {urun.stock > 0 ? (
+                          // Stok VARSA -> Yeşil Ekle Butonu
+                          <button 
+                            className="btn text-white w-100 py-2 btn-sm" 
+                            style={{ backgroundColor: themeColor, borderRadius: '15px', fontWeight: '600' }}
+                            onClick={() => addToCart(urun)}
+                          >
+                            Sepete Ekle
+                          </button>
+                        ) : (
+                          // Stok YOKSA -> Gri Pasif Buton
+                          <button 
+                            className="btn btn-secondary w-100 py-2 btn-sm" 
+                            style={{ borderRadius: '15px', fontWeight: '600', cursor: 'not-allowed', opacity: 0.6 }}
+                            disabled // Butonu devre dışı bırakır
+                          >
+                            Stokta Yok
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
