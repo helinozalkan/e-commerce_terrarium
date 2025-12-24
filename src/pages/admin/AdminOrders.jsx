@@ -1,17 +1,11 @@
 // src/pages/admin/AdminOrders.jsx
-import React, { useState } from 'react';
-import { allOrders } from '../../data/orders'; // YENİ: Veri dosyasını import ettik
+import React from 'react';
+import { useOrders } from '../../context/OrderContext'; // YENİ IMPORT
 
 const AdminOrders = () => {
-  // Mock data yerine import ettiğimiz veriyi kullanıyoruz
-  const [orders, setOrders] = useState(allOrders);
+  // Context'ten verileri ve fonksiyonları çekiyoruz
+  const { orders, updateOrderStatus, deleteOrder } = useOrders();
 
-  // Sipariş Durumu Güncelleme
-  const updateStatus = (id, newStatus) => {
-    setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order));
-  };
-
-  // Renkli Durum Rozetleri
   const getStatusBadge = (status) => {
     switch (status) {
       case "Yeni Sipariş": return "bg-primary";
@@ -70,11 +64,12 @@ const AdminOrders = () => {
                       </button>
                       <ul className="dropdown-menu shadow border-0">
                         <li><h6 className="dropdown-header">Durum Güncelle</h6></li>
-                        <li><button className="dropdown-item" onClick={() => updateStatus(order.id, "Hazırlanıyor")}>Hazırlanıyor</button></li>
-                        <li><button className="dropdown-item" onClick={() => updateStatus(order.id, "Kargolandı")}>Kargolandı</button></li>
-                        <li><button className="dropdown-item" onClick={() => updateStatus(order.id, "Teslim Edildi")}>Teslim Edildi</button></li>
+                        <li><button className="dropdown-item" onClick={() => updateOrderStatus(order.id, "Hazırlanıyor")}>Hazırlanıyor</button></li>
+                        <li><button className="dropdown-item" onClick={() => updateOrderStatus(order.id, "Kargolandı")}>Kargolandı</button></li>
+                        <li><button className="dropdown-item" onClick={() => updateOrderStatus(order.id, "Teslim Edildi")}>Teslim Edildi</button></li>
                         <li><hr className="dropdown-divider"/></li>
-                        <li><button className="dropdown-item text-danger" onClick={() => updateStatus(order.id, "İptal")}>Siparişi İptal Et</button></li>
+                        <li><button className="dropdown-item text-danger" onClick={() => updateOrderStatus(order.id, "İptal")}>Siparişi İptal Et</button></li>
+                        <li><button className="dropdown-item text-danger" onClick={() => deleteOrder(order.id)}>Kaydı Sil</button></li>
                       </ul>
                     </div>
                   </td>

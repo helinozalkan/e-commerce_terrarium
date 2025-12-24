@@ -17,7 +17,9 @@ import AdminDashboard from './pages/AdminDashboard';
 // Context Yapıları
 import { CartProvider } from './context/CartContext';
 import { FavoritesProvider } from './context/FavoritesContext';
-import { ProductProvider } from './context/ProductContext'; // YENİ EKLENDİ
+import { ProductProvider } from './context/ProductContext';
+import { SellerProvider } from './context/SellerContext'; 
+import { OrderProvider } from './context/OrderContext';
 
 // Müşteri Sayfaları Düzeni
 const CustomerLayout = ({ children }) => (
@@ -29,26 +31,30 @@ const CustomerLayout = ({ children }) => (
 
 function App() {
   return (
-    // ProductProvider EN DIŞA VEYA DİĞER PROVIDERLARIN YANINA EKLENMELİ
+   
     <ProductProvider>
-      <CartProvider>
-        <FavoritesProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<CustomerLayout><Home /></CustomerLayout>} />
-              <Route path="/urunler" element={<CustomerLayout><Products /></CustomerLayout>} />
-              <Route path="/sepetim" element={<CustomerLayout><Cart /></CustomerLayout>} />
-              <Route path="/favoriler" element={<CustomerLayout><Favorites /></CustomerLayout>} />
-              <Route path="/login" element={<CustomerLayout><Login /></CustomerLayout>} />
-              
-              {/* Admin Rotası */}
-              <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
-              
-              <Route path="*" element={<CustomerLayout><div className="text-center mt-5"><h1>404 - Sayfa Bulunamadı</h1></div></CustomerLayout>} />
-            </Routes>
-          </Router>
-        </FavoritesProvider>
-      </CartProvider>
+      <SellerProvider>
+        <OrderProvider>
+        <CartProvider>
+          <FavoritesProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<CustomerLayout><Home /></CustomerLayout>} />
+                <Route path="/urunler" element={<CustomerLayout><Products /></CustomerLayout>} />
+                <Route path="/sepetim" element={<CustomerLayout><Cart /></CustomerLayout>} />
+                <Route path="/favoriler" element={<CustomerLayout><Favorites /></CustomerLayout>} />
+                <Route path="/login" element={<CustomerLayout><Login /></CustomerLayout>} />
+                
+                {/* Admin Rotası */}
+                <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
+                
+                <Route path="*" element={<CustomerLayout><div className="text-center mt-5"><h1>404 - Sayfa Bulunamadı</h1></div></CustomerLayout>} />
+              </Routes>
+            </Router>
+          </FavoritesProvider>
+        </CartProvider>
+        </OrderProvider>
+      </SellerProvider>
     </ProductProvider>
   );
 }
