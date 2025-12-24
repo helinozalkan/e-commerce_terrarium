@@ -95,7 +95,7 @@ const Favorites = () => {
                       </p>
                     </div>
                     
-                    <div className="fs-5 fw-bold text-dark mb-2">{urun.price} TL</div>
+                    <div className="fs-5 fw-bold text-dark mb-2">{urun.price.toFixed(2)} TL</div>
 
                     <button 
                       className="btn text-white w-100 py-2 btn-sm" 
