@@ -3,19 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
+import { categories } from '../data/products'; // Sadece kategoriler
 
-// MERKEZİ VERİ DOSYASINDAN IMPORT EDİYORUZ
-import { allProducts, categories } from '../data/products';
+// ÖNEMLİ: CONTEXT'TEN CANLI VERİ ÇEKİYORUZ
+import { useProducts } from '../context/ProductContext';
 
 const Products = () => {
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites(); 
 
+  // Context'ten ürünleri al
+  const { products } = useProducts(); 
+
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [sortOption, setSortOption] = useState("varsayilan");
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [filteredProducts, setFilteredProducts] = useState(products);
 
-  // Yıldız Puanlama Görseli
+  // Yıldız Puanlama
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -30,16 +34,17 @@ const Products = () => {
     return stars;
   };
 
-  // Filtreleme ve Sıralama Mantığı
+  // FİLTRELEME VE SIRALAMA (PRODUCTS DEĞİŞTİĞİNDE ÇALIŞIR)
   useEffect(() => {
-    let tempProducts = [...allProducts];
+    // 1. Kaynak olarak Context'ten gelen "products" dizisini kullanıyoruz
+    let tempProducts = [...products];
 
-    // 1. Kategori Filtreleme
+    // 2. Kategori Filtreleme
     if (selectedCategory !== "Tümü") {
       tempProducts = tempProducts.filter(product => product.category === selectedCategory);
     }
 
-    // 2. Sıralama
+    // 3. Sıralama
     if (sortOption === "artan-fiyat") {
       tempProducts.sort((a, b) => a.price - b.price);
     } else if (sortOption === "azalan-fiyat") {
@@ -51,7 +56,7 @@ const Products = () => {
     }
 
     setFilteredProducts(tempProducts);
-  }, [selectedCategory, sortOption]);
+  }, [selectedCategory, sortOption, products]); // "products" değiştiğinde (admin güncellediğinde) burası çalışır
 
   const themeColor = '#198754'; 
 
@@ -70,7 +75,7 @@ const Products = () => {
       <div className="container-fluid px-lg-5">
         <div className="row">
           
-          {/* SOL TARA: YAPIŞKAN (STICKY) SIDEBAR */}
+          {/* SIDEBAR */}
           <div className="col-lg-3 col-xl-2 mb-4">
             <div className="bg-white p-4 shadow-sm rounded-4" style={{ position: 'sticky', top: '20px', border: '1px solid #eee' }}>
               <h5 className="fw-bold mb-4" style={{ color: '#333' }}><i className="bi bi-tree me-2"></i>Kategoriler</h5>
@@ -89,7 +94,7 @@ const Products = () => {
                     <span style={{ fontWeight: selectedCategory === cat ? '600' : '400' }}>{cat}</span>
                     {cat !== "Tümü" && (
                        <span className="badge rounded-pill" style={{ backgroundColor: selectedCategory === cat ? 'rgba(255,255,255,0.3)' : '#eee', color: selectedCategory === cat ? '#fff' : '#777' }}>
-                         {allProducts.filter(p => p.category === cat).length}
+                         {products.filter(p => p.category === cat).length}
                        </span>
                     )}
                   </button>
@@ -98,7 +103,7 @@ const Products = () => {
             </div>
           </div>
 
-          {/* SAĞ TARA: ÜRÜN LİSTESİ */}
+          {/* ÜRÜN LİSTESİ */}
           <div className="col-lg-9 col-xl-10">
             
             {/* Üst Bar */}
@@ -125,7 +130,6 @@ const Products = () => {
                       
                       {/* --- GÖRSEL ALANI VE UYARILAR --- */}
                       <div className="position-relative bg-white text-center">
-                        {/* Ürün Tükendiyse Linke Tıklanmasın (Opsiyonel, tıklanabilir de yapılabilir) */}
                         <Link to={`/product/${urun.id}`} style={{ pointerEvents: urun.stock === 0 ? 'none' : 'auto' }}>
                           <img 
                             src={`/images/${urun.image}`} 
@@ -136,7 +140,6 @@ const Products = () => {
                               objectFit: 'cover', 
                               width: '100%', 
                               display: 'block',
-                              // Stok 0 ise Siyah-Beyaz yap ve soluklaştır
                               filter: urun.stock === 0 ? 'grayscale(100%)' : 'none', 
                               opacity: urun.stock === 0 ? 0.6 : 1
                             }} 
@@ -144,7 +147,7 @@ const Products = () => {
                           />
                         </Link>
 
-                        {/* STOK UYARISI: KRİTİK STOK (0 ile 5 arası) -> Sol Üst Köşe */}
+                        {/* STOK UYARISI: SOL ÜST KÖŞE (5'ten az ve 0 değilse) */}
                         {urun.stock > 0 && urun.stock < 5 && (
                           <span 
                             className="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm"
@@ -154,7 +157,7 @@ const Products = () => {
                           </span>
                         )}
 
-                        {/* STOK UYARISI: TÜKENDİ (Stok 0 ise) -> Ortada Büyük Yazı */}
+                        {/* STOK UYARISI: TÜKENDİ (Stok 0 ise) */}
                         {urun.stock === 0 && (
                           <div 
                             className="position-absolute top-50 start-50 translate-middle bg-dark text-white px-4 py-2 rounded fw-bold shadow"
@@ -202,9 +205,8 @@ const Products = () => {
                         
                         <div className="fs-5 fw-bold text-dark mb-2">{urun.price} TL</div>
 
-                        {/* BUTON MANTIĞI: STOK KONTROLÜ */}
+                        {/* BUTON: STOK VARSA EKLER, YOKSA PASİF OLUR */}
                         {urun.stock > 0 ? (
-                          // Stok VARSA -> Yeşil Ekle Butonu
                           <button 
                             className="btn text-white w-100 py-2 btn-sm" 
                             style={{ backgroundColor: themeColor, borderRadius: '15px', fontWeight: '600' }}
@@ -213,11 +215,10 @@ const Products = () => {
                             Sepete Ekle
                           </button>
                         ) : (
-                          // Stok YOKSA -> Gri Pasif Buton
                           <button 
                             className="btn btn-secondary w-100 py-2 btn-sm" 
                             style={{ borderRadius: '15px', fontWeight: '600', cursor: 'not-allowed', opacity: 0.6 }}
-                            disabled // Butonu devre dışı bırakır
+                            disabled
                           >
                             Stokta Yok
                           </button>

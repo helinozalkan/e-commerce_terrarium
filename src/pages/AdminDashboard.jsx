@@ -5,10 +5,12 @@ import AdminSidebar from '../components/AdminSidebar';
 import AdminSellers from './admin/AdminSellers'; 
 import AdminOrders from './admin/AdminOrders'; 
 
-// MERKEZİ VERİ VE KATEGORİLER IMPORT EDİLDİ
-import { allProducts, categories } from '../data/products';
+// KATEGORİLERİ HALA DOSYADAN ALABİLİRİZ (Çünkü değişmiyorlar)
+import { categories } from '../data/products';
 
-// SATICI LİSTESİ (Modalda seçim için)
+// ÖNEMLİ: VERİ YÖNETİMİ İÇİN CONTEXT EKLENDİ
+import { useProducts } from '../context/ProductContext';
+
 const sellersList = ["Cam Dünyası", "Yeşil Sera", "Hobi Market", "Taş Dünyası", "Doğa Sanat"];
 
 // --- DASHBOARD HOME BİLEŞENİ ---
@@ -31,47 +33,50 @@ const DashboardHome = ({ inventory }) => {
   );
 };
 
-// --- STOK YÖNETİMİ BİLEŞENİ (GÜNCELLENDİ) ---
-const StockManagement = ({ inventory, setInventory }) => {
+// --- STOK YÖNETİMİ BİLEŞENİ ---
+const StockManagement = () => {
+  // CONTEXT'TEN VERİLERİ VE FONKSİYONLARI ÇEKİYORUZ
+  const { products, updateProduct, addProduct } = useProducts();
+
   const [showModal, setShowModal] = useState(false);
   
-  // DETAYLI FORM STATE
+  // Yeni Ürün Form State
   const [newProduct, setNewProduct] = useState({
     name: "", 
-    category: categories[1], // Varsayılan: Fanuslar
+    category: categories[1], 
     description: "",
-    seller: sellersList[0], // Varsayılan: İlk satıcı
+    seller: sellersList[0], 
     price: "", 
     stock: "",
-    image: "" // Görsel ismi
+    image: "" 
   });
 
+  // Stok Güncelleme (Context Kullanarak)
   const updateStock = (id, amount) => {
-    setInventory(inventory.map(item => {
-      if (item.id === id) {
-        const newStock = Math.max(0, item.stock + amount);
-        return { ...item, stock: newStock };
-      }
-      return item;
-    }));
+    const productToUpdate = products.find(p => p.id === id);
+    if (productToUpdate) {
+      const newStock = Math.max(0, productToUpdate.stock + amount);
+      // Context'teki güncelleme fonksiyonunu çağırıyoruz
+      updateProduct({ ...productToUpdate, stock: newStock });
+    }
   };
 
+  // Yeni Ürün Ekleme (Context Kullanarak)
   const handleAddProduct = () => {
-    // Basit Validasyon
     if (!newProduct.name || !newProduct.price || !newProduct.stock || !newProduct.description) {
       return alert("Lütfen tüm zorunlu alanları doldurun!");
     }
 
     const productToAdd = {
-      id: inventory.length + 1,
+      id: Date.now(), // Benzersiz ID için
       ...newProduct,
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
-      rating: 0, // Yeni ürün
-      image: newProduct.image || "teraryum.jpg" // Görsel girilmezse varsayılan
+      rating: 0, 
+      image: newProduct.image || "teraryum.jpg" 
     };
 
-    setInventory([...inventory, productToAdd]);
+    addProduct(productToAdd); // Context'e ekle
     setShowModal(false);
     setNewProduct({ name: "", category: categories[1], description: "", seller: sellersList[0], price: "", stock: "", image: "" });
   };
@@ -85,7 +90,7 @@ const StockManagement = ({ inventory, setInventory }) => {
         </button>
       </div>
 
-      {/* --- GELİŞMİŞ MODAL --- */}
+      {/* --- MODAL (EKLEME FORMU) --- */}
       {showModal && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="bg-white p-4 rounded-4 shadow-lg" style={{ width: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
@@ -137,13 +142,13 @@ const StockManagement = ({ inventory, setInventory }) => {
         </div>
       )}
 
-      {/* --- TABLO (GÖRSEL EKLENDİ) --- */}
+      {/* --- TABLO --- */}
       <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div className="table-responsive">
           <table className="table table-hover align-middle mb-0">
             <thead className="bg-light text-secondary">
               <tr>
-                <th className="py-3 ps-4">Ürün</th> {/* Görsel + İsim */}
+                <th className="py-3 ps-4">Ürün</th> 
                 <th>Kategori</th>
                 <th>Satıcı</th>
                 <th>Fiyat</th>
@@ -153,34 +158,41 @@ const StockManagement = ({ inventory, setInventory }) => {
               </tr>
             </thead>
             <tbody>
-              {inventory.map((product) => (
+              {products.map((product) => (
                 <tr key={product.id}>
                   <td className="ps-4">
                     <div className="d-flex align-items-center">
-                      <img 
-                        src={`/images/${product.image}`} 
-                        alt={product.name}
-                        className="rounded-3 me-3 border"
-                        style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                        onError={(e) => { e.target.src = "https://via.placeholder.com/40"; }}
-                      />
+                      <div className="me-3" style={{ width: '40px', height: '40px' }}>
+                        <img 
+                          src={`/images/${product.image}`} 
+                          alt={product.name}
+                          className="rounded-3 border"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = "https://via.placeholder.com/40"; }}
+                        />
+                      </div>
                       <span className="fw-semibold text-dark">{product.name}</span>
                     </div>
                   </td>
                   <td><span className="badge bg-light text-secondary border">{product.category}</span></td>
                   <td><small className="text-muted fw-bold">{product.seller}</small></td>
                   <td className="fw-bold text-secondary">{product.price} TL</td>
+                  
+                  {/* STOK MİKTARI */}
                   <td className="text-center">
                     <span className={`fs-5 fw-bold ${product.stock === 0 ? 'text-muted' : product.stock <= 5 ? 'text-danger' : 'text-success'}`}>
                       {product.stock}
                     </span>
                   </td>
+
+                  {/* STOK İŞLEM BUTONLARI */}
                   <td className="text-center">
                     <div className="btn-group shadow-sm">
                       <button className="btn btn-sm btn-outline-secondary" onClick={() => updateStock(product.id, -1)}><i className="bi bi-dash"></i></button>
                       <button className="btn btn-sm btn-outline-success" onClick={() => updateStock(product.id, 1)}><i className="bi bi-plus"></i></button>
                     </div>
                   </td>
+
                   <td className="text-center">
                     {product.stock === 0 ? <span className="badge bg-secondary">Tükendi</span> : 
                      product.stock <= 5 ? <span className="badge bg-warning text-dark">Kritik</span> : 
@@ -198,15 +210,16 @@ const StockManagement = ({ inventory, setInventory }) => {
 
 // --- ANA ADMIN LAYOUT ---
 const AdminDashboard = () => {
-  const [inventory, setInventory] = useState(allProducts);
+  // Context'ten tüm ürünleri çekiyoruz
+  const { products } = useProducts();
 
   return (
     <div className="d-flex bg-light" style={{ minHeight: '100vh' }}>
       <AdminSidebar />
       <div className="flex-grow-1" style={{ overflowY: 'auto', height: '100vh' }}>
         <Routes>
-          <Route path="/" element={<DashboardHome inventory={inventory} />} />
-          <Route path="stok" element={<StockManagement inventory={inventory} setInventory={setInventory} />} />
+          <Route path="/" element={<DashboardHome inventory={products} />} />
+          <Route path="stok" element={<StockManagement />} />
           <Route path="saticilar" element={<AdminSellers />} />
           <Route path="siparisler" element={<AdminOrders />} />
         </Routes>
