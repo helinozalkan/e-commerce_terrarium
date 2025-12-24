@@ -277,7 +277,7 @@ const StockManagement = () => {
                   <td className="ps-4"><div className="d-flex align-items-center"><img src={`/images/${product.image}`} className="rounded me-3 border" style={{ width: '40px', height: '40px', objectFit: 'cover' }} onError={(e)=>{e.target.src="https://via.placeholder.com/40"}} alt="" /><span className="fw-semibold text-dark">{product.name}</span></div></td>
                   <td><span className="badge bg-light text-secondary border">{product.category}</span></td>
                   <td><small className="text-muted fw-bold">{product.seller}</small></td>
-                  <td className="fw-bold text-secondary">{product.price} TL</td>
+                  <td className="fw-bold text-secondary">{product.price.toFixed(2)} TL</td>
                   <td className="text-center"><span className={`fs-5 fw-bold ${product.stock === 0 ? 'text-muted' : product.stock <= 5 ? 'text-danger' : 'text-success'}`}>{product.stock}</span></td>
                   <td className="text-center"><div className="btn-group shadow-sm"><button className="btn btn-sm btn-outline-secondary" onClick={() => updateStock(product.id, -1)}>-</button><button className="btn btn-sm btn-outline-success" onClick={() => updateStock(product.id, 1)}>+</button></div></td>
                   <td className="text-center">{product.stock === 0 ? <span className="badge bg-secondary">Tükendi</span> : product.stock <= 5 ? <span className="badge bg-warning text-dark">Kritik</span> : <span className="badge bg-success">Stokta</span>}</td>

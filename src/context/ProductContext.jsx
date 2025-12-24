@@ -5,29 +5,26 @@ import { allProducts } from '../data/products'; // Varsayılan veriler
 const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
-  // 1. Başlangıçta localStorage kontrolü yapıyoruz.
-  // Eğer tarayıcıda kayıtlı veri varsa onu kullan, yoksa dosyadaki veriyi al.
+  // 1. ÖNEMLİ: "siteProducts" olan anahtarı "siteProducts_v2" yaptık.
+  // Bu sayede tarayıcı eski fiyatları silip yeni küsuratlı fiyatları yükleyecek.
   const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem('siteProducts');
+    const savedProducts = localStorage.getItem('siteProducts_v2'); // <-- DEĞİŞTİ
     return savedProducts ? JSON.parse(savedProducts) : allProducts;
   });
 
-  // 2. Ürünlerde herhangi bir değişiklik olduğunda (stok, fiyat vb.)
-  // bunu localStorage'a "siteProducts" adıyla kaydet.
+  // 2. Kaydederken de yeni anahtarı kullanıyoruz.
   useEffect(() => {
-    localStorage.setItem('siteProducts', JSON.stringify(products));
+    localStorage.setItem('siteProducts_v2', JSON.stringify(products)); // <-- DEĞİŞTİ
   }, [products]);
 
   // --- Fonksiyonlar ---
 
-  // Admin: Stok veya Ürün Bilgisi Güncelleme
   const updateProduct = (updatedProduct) => {
     setProducts((prevProducts) =>
       prevProducts.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
     );
   };
 
-  // Admin: Yeni Ürün Ekleme
   const addProduct = (newProduct) => {
     setProducts((prevProducts) => [...prevProducts, newProduct]);
   };

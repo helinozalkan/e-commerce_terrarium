@@ -203,7 +203,7 @@ const Products = () => {
                           </p>
                         </div>
                         
-                        <div className="fs-5 fw-bold text-dark mb-2">{urun.price} TL</div>
+                        <div className="fs-5 fw-bold text-dark mb-2">{urun.price.toFixed(2)} TL</div>
 
                         {/* BUTON: STOK VARSA EKLER, YOKSA PASİF OLUR */}
                         {urun.stock > 0 ? (
