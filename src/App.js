@@ -13,6 +13,8 @@ import Products from './pages/Products';
 import Favorites from './pages/Favorites';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
+import OurStory from './pages/OurStory'; 
+import Blog from './pages/Blog';
 
 // Context Yapıları
 import { CartProvider } from './context/CartContext';
@@ -44,6 +46,8 @@ function App() {
                 <Route path="/sepetim" element={<CustomerLayout><Cart /></CustomerLayout>} />
                 <Route path="/favoriler" element={<CustomerLayout><Favorites /></CustomerLayout>} />
                 <Route path="/login" element={<CustomerLayout><Login /></CustomerLayout>} />
+                <Route path="/hikayemiz" element={<CustomerLayout><OurStory /></CustomerLayout>} />
+                <Route path="/blog" element={<CustomerLayout><Blog /></CustomerLayout>} />
                 
                 {/* Admin Rotası */}
                 <Route path="/admin-dashboard/*" element={<AdminDashboard />} />

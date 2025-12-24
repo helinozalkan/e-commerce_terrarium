@@ -47,10 +47,10 @@ const Navbar = () => {
               <Link className="nav-link text-dark hover-success" to="/urunler">Koleksiyonlar</Link>
             </li>
             <li className="nav-item px-3">
-              <Link className="nav-link text-dark hover-success" to="/girisimciler">Hikayemiz</Link>
+              <Link className="nav-link text-dark hover-success" to="/hikayemiz">Hikayemiz</Link>
             </li>
             <li className="nav-item px-3">
-              <Link className="nav-link text-dark hover-success" to="/motivasyon">Blog</Link>
+              <Link className="nav-link text-dark hover-success" to="/blog">Blog</Link>
             </li>
           </ul>
 
